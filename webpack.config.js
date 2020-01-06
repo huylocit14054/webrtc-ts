@@ -32,6 +32,11 @@ module.exports = {
       }
     ]
   },
+  // devServer: {
+  //   contentBase: path.join(__dirname, "dist"),
+  //   compress: true,
+  //   port: 3000
+  // },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js"],
     modules: [path.resolve(__dirname, "src"), "node_modules"]

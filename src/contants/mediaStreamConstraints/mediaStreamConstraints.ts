@@ -8,3 +8,7 @@ export const MEDIA_STREAM_CONSTRAINTS: MediaStreamConstraints = {
     }
   }
 };
+
+export const OFFER_OPTIONS: RTCOfferOptions = {
+  offerToReceiveVideo: true
+};
