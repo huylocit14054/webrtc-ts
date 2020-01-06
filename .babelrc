@@ -1,0 +1,25 @@
+{
+  "presets": [
+    ["@babel/env", { "modules": false }],
+    "@babel/react",
+    "@babel/typescript"
+  ],
+  "plugins": [
+    "@babel/proposal-class-properties",
+    "@babel/proposal-object-rest-spread",
+    "@babel/proposal-export-namespace-from",
+    "@babel/proposal-export-default-from",
+    "@babel/syntax-dynamic-import",
+    "lodash"
+  ],
+  "env": {
+    "test": {
+      "presets": [["@babel/env"], "@babel/react"],
+      "plugins": [
+        "@babel/proposal-class-properties",
+        "@babel/transform-modules-commonjs",
+        "dynamic-import-node"
+      ]
+    }
+  }
+}

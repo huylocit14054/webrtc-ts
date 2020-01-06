@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": ["es6", "dom"],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "target": "esnext",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*"],
+      "tests": ["__tests__/*"]
+    }
+  },
+  "plugins": [{ "name": "typescript-tslint-plugin" }],
+  "exclude": ["node_modules", "babel.config.js"]
+}
