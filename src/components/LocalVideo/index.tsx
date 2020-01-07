@@ -22,8 +22,12 @@ const LocalVideo = () => {
   const [isStartDisable, setIsStartDisable] = useState(false);
   const [isHangupDisable, setIsHangupDisable] = useState(true);
   const [localStream, setLocalStream] = useState({} as MediaStream);
-  const localPeerConnection = new RTCPeerConnection();
-  const remotePeerConnection = new RTCPeerConnection();
+  const [localPeerConnection, setLocalPeerConnection] = useState(
+    new RTCPeerConnection()
+  );
+  const [remotePeerConnection, setRemotePeerConnection] = useState(
+    new RTCPeerConnection()
+  );
 
   const getMediaDevicesCallback = ({
     mediaStream
@@ -42,17 +46,6 @@ const LocalVideo = () => {
   const handleConnectionListener = async (e: RTCPeerConnectionIceEvent) => {
     await handleConnection(e, localPeerConnection, remotePeerConnection);
   };
-
-  useEffect(() => {
-    addICECandidate(localPeerConnection, handleConnectionListener);
-    addICEConnectionStateChange(localPeerConnection, handleConnectionChange);
-
-    addICECandidate(remotePeerConnection, handleConnectionListener);
-    addICEConnectionStateChange(remotePeerConnection, handleConnectionChange);
-    remotePeerConnection.addEventListener("addstream", (event: any) =>
-      gotRemoteMediaStream({ event, videoRef: remoteVideoRef })
-    );
-  }, []);
 
   const handleStartButton = async () => {
     setIsStartDisable(true);
@@ -79,6 +72,16 @@ const LocalVideo = () => {
       console.log(`Using audio device: ${audioTracks[0].label}.`);
     }
 
+    addICECandidate(localPeerConnection, handleConnectionListener);
+    addICEConnectionStateChange(localPeerConnection, handleConnectionChange);
+
+    addICECandidate(remotePeerConnection, handleConnectionListener);
+    addICEConnectionStateChange(remotePeerConnection, handleConnectionChange);
+
+    remotePeerConnection.addEventListener("addstream", (event: any) =>
+      gotRemoteMediaStream({ event, videoRef: remoteVideoRef })
+    );
+
     localStream
       .getTracks()
       .forEach(track => localPeerConnection.addTrack(track, localStream));
@@ -95,6 +98,15 @@ const LocalVideo = () => {
     });
   };
 
+  const onHangup = () => {
+    localPeerConnection.close();
+    remotePeerConnection.close();
+    setLocalPeerConnection(new RTCPeerConnection());
+    setRemotePeerConnection(new RTCPeerConnection());
+    setIsCallDisable(false);
+    setIsHangupDisable(true);
+  };
+
   return (
     <>
       <video id="localVideo" autoPlay playsInline ref={localVideoRef}></video>
@@ -105,6 +117,7 @@ const LocalVideo = () => {
         isHangupDisable={isHangupDisable}
         handleStartButton={handleStartButton}
         handleOnCallButton={handleCallAction}
+        onHangup={onHangup}
       />
     </>
   );

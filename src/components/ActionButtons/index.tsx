@@ -6,6 +6,7 @@ type Props = {
   isHangupDisable: boolean;
   handleStartButton: () => void;
   handleOnCallButton: () => void;
+  onHangup: () => void;
 };
 
 const ActionButtons = ({
@@ -13,7 +14,8 @@ const ActionButtons = ({
   isStartDisable,
   isHangupDisable,
   handleStartButton,
-  handleOnCallButton
+  handleOnCallButton,
+  onHangup
 }: Props) => {
   return (
     <div>
@@ -31,7 +33,7 @@ const ActionButtons = ({
       >
         Call
       </button>
-      <button disabled={isHangupDisable} id="hangupButton">
+      <button onClick={onHangup} disabled={isHangupDisable} id="hangupButton">
         Hang Up
       </button>
     </div>
