@@ -10,6 +10,7 @@
     "@babel/proposal-export-namespace-from",
     "@babel/proposal-export-default-from",
     "@babel/syntax-dynamic-import",
+    "@babel/plugin-proposal-optional-chaining",
     "lodash"
   ],
   "env": {

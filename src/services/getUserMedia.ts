@@ -46,7 +46,6 @@ export const handleConnection = async (
 ) => {
   const peerConnection = event.target as RTCPeerConnection;
   const iceCandidate = event.candidate;
-  console.log("handleConnection");
 
   if (iceCandidate) {
     const newIceCandidate = new RTCIceCandidate(
@@ -59,7 +58,10 @@ export const handleConnection = async (
     );
     try {
       await otherPeer.addIceCandidate(newIceCandidate);
-    } catch (error) {}
+      handleConnectionSuccess(peerConnection, localPeerConnection);
+    } catch (error) {
+      console.log("handleConnection error", error);
+    }
   }
 };
 
@@ -117,12 +119,12 @@ export const addICEConnectionStateChange = (
 };
 
 type CreateOfferParams = {
-  offerOption: RTCOfferOptions;
+  offerOption?: RTCOfferOptions;
   localPeerConnection: RTCPeerConnection;
   remotePeerConnection: RTCPeerConnection;
 };
 export const createOffer = async ({
-  offerOption,
+  offerOption = {},
   localPeerConnection,
   remotePeerConnection
 }: CreateOfferParams) => {
