@@ -181,7 +181,15 @@ export const createAnswer = async ({
   }
 };
 
-export const gotRemoteMediaStream = ({ event, videoRef }) => {
+type GotRemoteMediaStreamPrams = {
+  event: MediaStreamEvent;
+  videoRef: React.RefObject<HTMLVideoElement>;
+};
+
+export const gotRemoteMediaStream = ({
+  event,
+  videoRef
+}: GotRemoteMediaStreamPrams) => {
   console.log("event", event);
   const mediaStream = event.stream;
   videoRef.current && (videoRef.current.srcObject = mediaStream);

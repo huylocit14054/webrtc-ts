@@ -14,7 +14,6 @@ import {
   OFFER_OPTIONS
 } from "contants/mediaStreamConstraints/mediaStreamConstraints";
 import ActionButtons from "components/ActionButtons";
-import adapter from "webrtc-adapter";
 
 const LocalVideo = () => {
   const localVideoRef = useRef(null);
@@ -50,10 +49,10 @@ const LocalVideo = () => {
 
     addICECandidate(remotePeerConnection, handleConnectionListener);
     addICEConnectionStateChange(remotePeerConnection, handleConnectionChange);
-    remotePeerConnection.addEventListener("addstream", event =>
+    remotePeerConnection.addEventListener("addstream", (event: any) =>
       gotRemoteMediaStream({ event, videoRef: remoteVideoRef })
     );
-  });
+  }, []);
 
   const handleStartButton = async () => {
     setIsStartDisable(true);
@@ -79,6 +78,7 @@ const LocalVideo = () => {
     if (audioTracks.length > 0) {
       console.log(`Using audio device: ${audioTracks[0].label}.`);
     }
+
     localStream
       .getTracks()
       .forEach(track => localPeerConnection.addTrack(track, localStream));
