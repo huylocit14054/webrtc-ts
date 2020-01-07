@@ -1,14 +1,22 @@
 import React from "react";
+import { Redirect, Switch } from "react-router";
+import { Link, Route } from "react-router-dom";
+import { ROUTES } from "constants/mediaStreamConstraints/routes";
 import LocalVideo from "./LocalVideo";
-import RemoteVideo from "./RemoteVideo";
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <h1>Realtime communication with WebRTC</h1>
+      <Link to={ROUTES.LOCAL_VIDEO_STREAM}>Local Stream Video</Link>
       <div>
-        <LocalVideo />
-        {/* <RemoteVideo /> */}
+        <Switch>
+          <Route
+            exact
+            path={ROUTES.LOCAL_VIDEO_STREAM}
+            component={LocalVideo}
+          />
+          <Redirect from={ROUTES.HOME} to={ROUTES.LOCAL_VIDEO_STREAM} />
+        </Switch>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import {
 import {
   MEDIA_STREAM_CONSTRAINTS,
   OFFER_OPTIONS
-} from "contants/mediaStreamConstraints/mediaStreamConstraints";
+} from "constants/mediaStreamConstraints/mediaStreamConstraints";
 import ActionButtons from "components/ActionButtons";
 
 const LocalVideo = () => {
@@ -109,6 +109,7 @@ const LocalVideo = () => {
 
   return (
     <>
+      <h1>Realtime stream with WebRTC</h1>
       <video id="localVideo" autoPlay playsInline ref={localVideoRef}></video>
       <video id="remoteVideo" autoPlay playsInline ref={remoteVideoRef}></video>
       <ActionButtons
