@@ -1,7 +1,7 @@
 import React from "react";
 import { Redirect, Switch } from "react-router";
 import { Link, Route } from "react-router-dom";
-import { ROUTES } from "constants/mediaStreamConstraints/routes";
+import { ROUTES } from "constants/routes";
 import LocalVideo from "./LocalVideo";
 import TextAreaInputs from "./TextAreaInputs";
 import JoinRoomInput from "./JoinRoomInput";

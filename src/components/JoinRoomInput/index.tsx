@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { ROUTES } from "constants/mediaStreamConstraints/routes";
+import { ROUTES } from "constants/routes";
 
 const JoinRoomInput = () => {
   const [inputValue, onChangeInputValue] = useState("");

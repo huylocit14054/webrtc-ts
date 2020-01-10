@@ -6,7 +6,17 @@ const port = process.env.PORT || 4001;
 const index = require("../routes/index");
 
 const app = express();
-app.use(index);
+app.use(
+  index
+  //   ,(_, res, next) => {
+  //   res.header("Access-Control-Allow-Origin", "https://4c726d29.ngrok.io"); // update to match the domain you will make the request from
+  //   res.header(
+  //     "Access-Control-Allow-Headers",
+  //     "Origin, X-Requested-With, Content-Type, Accept"
+  //   );
+  //   next();
+  // }
+);
 
 const server = http.createServer(app);
 
@@ -19,7 +29,10 @@ io.on("connection", socket => {
   };
 
   socket.on("create or join", room => {
+    // log("Received request to create or join room " + room);
     const clientsInRoom = io.sockets.adapter.rooms[room];
+    console.log("io.sockets.adapter.rooms", io.sockets.adapter.rooms);
+    console.log(`clientsInRoom ${room}`, clientsInRoom);
     const numClients = clientsInRoom
       ? Object.keys(clientsInRoom.sockets).length
       : 0;
@@ -27,10 +40,10 @@ io.on("connection", socket => {
 
     if (numClients === 0) {
       socket.join(room);
-      log("Client ID " + socket.id + " created room " + room);
+      // log("Client ID " + socket.id + " created room " + room);
       socket.emit("created", room, socket.id);
     } else if (numClients > 0 && numClients < 4) {
-      log("Client ID " + socket.id + " joined room " + room);
+      // log("Client ID " + socket.id + " joined room " + room);
       io.in(room).emit("join", room);
       socket.join(room);
       socket.emit("joined", room, socket.id);
@@ -41,9 +54,10 @@ io.on("connection", socket => {
     }
   });
 
-  socket.on("message", room => {
-    log("Client said: ", message);
-    io.in(room).emit("message", message);
+  socket.on("message", (room, message) => {
+    console.log(`${room} got message`, message);
+    // log("Client said: " + message);
+    socket.to(room).emit("message", message);
   });
 
   socket.on("ipaddr", () => {
@@ -58,7 +72,7 @@ io.on("connection", socket => {
   });
 
   socket.on("disconnect", () => {
-    log("Disconnect roi hu hu");
+    // log("Disconnect roi hu hu");
     console.log("Client disconnected");
   });
 });

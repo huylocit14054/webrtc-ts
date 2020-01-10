@@ -12,7 +12,7 @@ import {
 import {
   MEDIA_STREAM_CONSTRAINTS,
   OFFER_OPTIONS
-} from "constants/mediaStreamConstraints/mediaStreamConstraints";
+} from "constants/mediaStreamConstraints";
 import ActionButtons from "components/ActionButtons";
 
 const LocalVideo = () => {
@@ -36,12 +36,6 @@ const LocalVideo = () => {
   }) => {
     setLocalStream(mediaStream);
   };
-
-  // function getOtherPeer(peerConnection) {
-  //   return peerConnection === localPeerConnection
-  //     ? remotePeerConnection
-  //     : localPeerConnection;
-  // }
 
   const handleConnectionListener = async (e: RTCPeerConnectionIceEvent) => {
     await handleConnection(e, localPeerConnection, remotePeerConnection);

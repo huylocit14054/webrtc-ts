@@ -10,7 +10,7 @@ const gotLocalMediaStream = ({
   callBack
 }: GotLocalMediaStreamParams) => {
   videoRef.current && (videoRef.current.srcObject = mediaStream);
-  console.log("Received local stream.");
+  console.log("Received stream.");
   callBack && callBack({ mediaStream, videoRef });
 };
 
@@ -58,7 +58,7 @@ export const handleConnection = async (
     );
     try {
       await otherPeer.addIceCandidate(newIceCandidate);
-      handleConnectionSuccess(peerConnection, localPeerConnection);
+      handleConnectionSuccess(otherPeer, localPeerConnection);
     } catch (error) {
       console.log("handleConnection error", error);
     }
@@ -121,7 +121,7 @@ export const addICEConnectionStateChange = (
 type CreateOfferParams = {
   offerOption?: RTCOfferOptions;
   localPeerConnection: RTCPeerConnection;
-  remotePeerConnection: RTCPeerConnection;
+  remotePeerConnection?: RTCPeerConnection;
 };
 export const createOffer = async ({
   offerOption = {},
@@ -142,13 +142,16 @@ export const createOffer = async ({
       `setLocalDescription`
     );
 
-    console.log("remotePeerConnection setRemoteDescription start.");
-    await remotePeerConnection.setRemoteDescription(offerDescription);
-    setDescriptionSuccess(
-      remotePeerConnection,
-      localPeerConnection,
-      `setRemoteDescription`
-    );
+    if (remotePeerConnection) {
+      console.log("remotePeerConnection setRemoteDescription start.");
+      await remotePeerConnection.setRemoteDescription(offerDescription);
+      setDescriptionSuccess(
+        remotePeerConnection,
+        localPeerConnection,
+        `setRemoteDescription`
+      );
+    }
+    return offerDescription;
   } catch (error) {
     console.log("error", error);
   }
@@ -164,7 +167,7 @@ const setDescriptionSuccess = (
 };
 
 type CreateAnswerParams = {
-  localPeerConnection: RTCPeerConnection;
+  localPeerConnection?: RTCPeerConnection;
   remotePeerConnection: RTCPeerConnection;
 };
 
@@ -177,7 +180,9 @@ export const createAnswer = async ({
     console.log(`Answer from remotePeerConnection:\n${answerDescription.sdp}.`);
 
     await remotePeerConnection.setLocalDescription(answerDescription);
-    await localPeerConnection.setRemoteDescription(answerDescription);
+    localPeerConnection &&
+      (await localPeerConnection.setRemoteDescription(answerDescription));
+    return answerDescription;
   } catch (error) {
     console.log("error", error);
   }
@@ -196,4 +201,21 @@ export const gotRemoteMediaStream = ({
   const mediaStream = event.stream;
   videoRef.current && (videoRef.current.srcObject = mediaStream);
   console.log("Remote peer connection received remote stream.");
+};
+
+type HandleRemoteTrackAddedParams = {
+  event: RTCTrackEvent;
+  videoRef: React.RefObject<HTMLVideoElement>;
+};
+
+export const handleRemoteTrackAdded = ({
+  event,
+  videoRef
+}: HandleRemoteTrackAddedParams) => {
+  console.log("Remote stream added.");
+  const remoteStream = event.streams[0];
+  remoteStream.onremovetrack = event => {
+    console.log("Remote stream removed. Event: ", event);
+  };
+  videoRef.current && (videoRef.current.srcObject = event.streams[0]);
 };
