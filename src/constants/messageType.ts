@@ -2,7 +2,8 @@ export const STREAMING_MESSAGE = {
   GOT_USER_MEDIA: "got user media",
   OFFER: "offer",
   ANSWER: "answer",
-  CANDIDATE: "candidate"
+  CANDIDATE: "candidate",
+  BYE: "bye"
 };
 
 export type StreamingMessageObject = {

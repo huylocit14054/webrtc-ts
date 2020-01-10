@@ -13,7 +13,14 @@ export const OFFER_OPTIONS: RTCOfferOptions = {
   offerToReceiveVideo: true
 };
 
-export const PC_CONFIG = {
+type PcConfigType = {
+  iceServers: Array<{
+    urls: string;
+    credential?: string;
+  }>;
+};
+
+export const PC_CONFIG: PcConfigType = {
   iceServers: [
     {
       urls: "stun:stun.1.google.com:19302"
@@ -25,3 +32,6 @@ export const SDP_CONSTRAINTS = {
   offerToReceiveAudio: true,
   offerToReceiveVideo: true
 };
+
+export const TURN_URL =
+  "https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913";

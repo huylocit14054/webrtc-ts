@@ -9,17 +9,20 @@ import {
 } from "services/getUserMedia";
 import {
   MEDIA_STREAM_CONSTRAINTS,
-  SDP_CONSTRAINTS
+  SDP_CONSTRAINTS,
+  PC_CONFIG,
+  TURN_URL
 } from "constants/mediaStreamConstraints";
 import {
   StreamingMessageObject,
   STREAMING_MESSAGE
 } from "constants/messageType";
 
-const endpoint = process.env.SOCKET_URL || "https://c23b5732.ngrok.io";
+const endpoint = process.env.SOCKET_URL || "localhost:4001";
 console.log("endpoint", endpoint);
-const socket = socketIOClient(endpoint, { transports: ["websocket"] });
+const socket = socketIOClient(endpoint);
 let pc: RTCPeerConnection;
+let pcConfig = PC_CONFIG;
 
 const RoomDetail = () => {
   const { name: roomName } = useParams();
@@ -162,7 +165,55 @@ const RoomDetail = () => {
     );
   };
 
+  const requestTurn = (turnURL: string) => {
+    let turnExists = false;
+    let turnReady = false;
+    for (let i in pcConfig.iceServers) {
+      const isTurnUrls = pcConfig.iceServers[i].urls.substr(0, 5) === "turn:";
+      if (isTurnUrls) {
+        turnExists = true;
+        turnReady = true;
+        break;
+      }
+    }
+
+    if (!turnExists) {
+      console.log("Getting TURN server from ", turnURL);
+
+      const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var turnServer = JSON.parse(xhr.responseText);
+          console.log("Got TURN server: ", turnServer);
+          pcConfig.iceServers.push({
+            urls: "turn:" + turnServer.username + "@" + turnServer.turn,
+            credential: turnServer.password
+          });
+          turnReady = true;
+        }
+      };
+      xhr.open("GET", turnURL, true);
+      xhr.send();
+    }
+  };
+
+  const clearUpOnUnbound = () => {
+    // Removing the listener before un-mounting the component
+    // in order to avoid addition of multiple listener at the time revisit
+    console.log("Cleaning up");
+    socket.emit("leave", roomName);
+    sendMessage({ type: STREAMING_MESSAGE.BYE });
+    socket.off("log");
+    socket.off("created");
+    socket.off("join");
+    socket.off("joined");
+    socket.off("full");
+    socket.off("ipaddr");
+    socket.off("message");
+  };
+
   useEffect(() => {
+    window.addEventListener("beforeunload", clearUpOnUnbound);
     socket.on("log", onLog);
     socket.on("created", onCreatedRoom);
     socket.on("join", onJoinRoom);
@@ -173,16 +224,14 @@ const RoomDetail = () => {
     socket.emit("create or join", roomName);
     accessMediaOnJoin();
 
+    // get turn server when localhost is not connected
+    if (location.hostname !== "localhost") {
+      requestTurn(TURN_URL);
+    }
+
     return () => {
-      // Removing the listener before un-mounting the component
-      // in order to avoid addition of multiple listener at the time revisit
-      socket.off("log");
-      socket.off("created");
-      socket.off("join");
-      socket.off("joined");
-      socket.off("full");
-      socket.off("ipaddr");
-      socket.off("message");
+      clearUpOnUnbound();
+      window.removeEventListener("beforeunload", clearUpOnUnbound);
     };
   }, []);
 
@@ -212,6 +261,12 @@ const RoomDetail = () => {
     console.log("Add ICE candidate success");
   };
 
+  const handleRemoteHangup = () => {
+    console.log("Session terminated.");
+    pc.close();
+    setIsStarted(false);
+  };
+
   const setDataBasedOnReceivedMessage = async () => {
     if (serverResponseMessage.type === STREAMING_MESSAGE.GOT_USER_MEDIA) {
       await handleGotUserMediaMessage();
@@ -227,6 +282,11 @@ const RoomDetail = () => {
       isStarted
     ) {
       await handleGotCandidateMessage();
+    } else if (
+      serverResponseMessage.type === STREAMING_MESSAGE.BYE &&
+      isStarted
+    ) {
+      handleRemoteHangup();
     }
   };
 

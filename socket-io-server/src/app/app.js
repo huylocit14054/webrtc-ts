@@ -6,17 +6,7 @@ const port = process.env.PORT || 4001;
 const index = require("../routes/index");
 
 const app = express();
-app.use(
-  index
-  //   ,(_, res, next) => {
-  //   res.header("Access-Control-Allow-Origin", "https://4c726d29.ngrok.io"); // update to match the domain you will make the request from
-  //   res.header(
-  //     "Access-Control-Allow-Headers",
-  //     "Origin, X-Requested-With, Content-Type, Accept"
-  //   );
-  //   next();
-  // }
-);
+app.use(index);
 
 const server = http.createServer(app);
 
@@ -69,6 +59,11 @@ io.on("connection", socket => {
         }
       });
     }
+  });
+
+  socket.on("leave", room => {
+    console.log(`leaving room ${room}`);
+    socket.leave(room);
   });
 
   socket.on("disconnect", () => {
