@@ -18,7 +18,7 @@ import {
   STREAMING_MESSAGE
 } from "constants/messageType";
 
-const endpoint = process.env.SOCKET_URL || "localhost:4001";
+const endpoint = process.env.SOCKET_URL || "https://b0dce242.ngrok.io";
 console.log("endpoint", endpoint);
 const socket = socketIOClient(endpoint);
 let pc: RTCPeerConnection;
@@ -104,7 +104,7 @@ const RoomDetail = () => {
 
   const createPeerConnection = () => {
     try {
-      pc = new RTCPeerConnection();
+      pc = new RTCPeerConnection(pcConfig);
       pc.onicecandidate = handleIceCandidate;
       pc.ontrack = event => {
         console.log("On Track");
