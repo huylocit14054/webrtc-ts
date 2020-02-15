@@ -47,6 +47,6 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.7.6",
     "add": "^2.0.6",
-    "yarn": "^1.21.1"
+    "yarn": "^1.22.0"
   }
 }
